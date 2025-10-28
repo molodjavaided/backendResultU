@@ -43,9 +43,15 @@ async function removeNote(id) {
     const noteFilter = notes.filter(note => note.id !== id)
     await updateData(noteFilter)
     console.log(noteFilter);
+}
 
+async function updateNote(id, newTitle) {
+    const notes = await getNotes();
+    const noteIndex = notes.findIndex(note => note.id === id)
+    notes[noteIndex].title = newTitle;
+    await updateData(notes);
 }
 
 module.exports = {
-    addNote, printNotes, removeNote
+    addNote, removeNote, getNotes, updateNote
 }
