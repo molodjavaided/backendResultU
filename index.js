@@ -1,6 +1,7 @@
 const express = require('express')
 const chalk = require('chalk')
 const path = require('path')
+
 const { addNote, getNotes, removeNote, updateNote } = require('./notes.controller')
 
 const port = 3000;
@@ -47,6 +48,8 @@ app.put('/:id', async (request, response) => {
         created: false
     })
 })
+
+
 
 
 app.listen(port, () => {
