@@ -16,9 +16,7 @@ yargs.command({
             type: 'string'
         }
     },
-    async handler({ id, title}) {
-        updateNote(id, title)
+    async handler(data) {
+        updateNote(data.id, data.title)
     }
-})
-
-yargs.parse()
+}).parse()
