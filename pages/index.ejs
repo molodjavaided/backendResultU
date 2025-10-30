@@ -41,13 +41,24 @@
                                         <%= notes[i].title %>
                                     </div>
 
-                                    <div class="buttons">
-                                        <button class="btn btn-danger" data-type="edit"
-                                            data-id="<%= notes[i].id %>">Редактировать</button>
-                                        <button class="btn btn-danger" data-type="remove"
-                                            data-id="<%= notes[i].id %>">&times;</button>
+                                    <div class="edit-title" style="display: none;">
+                                        <input type="text" class="edit-input" value="<%= notes[i].title %>">
                                     </div>
 
+                                    <div class="buttons">
+                                        <div class="edit-buttons">
+                                            <button class="btn btn-danger" data-type="update"
+                                                data-id="<%= notes[i].id %>">Обновить</button>
+                                            <button class="btn btn-danger" data-type="remove"
+                                                data-id="<%= notes[i].id %>">&times;</button>
+                                        </div>
+                                        <div class="save-buttons" style="display: none;">
+                                            <button class="btn btn-danger" data-type="save"
+                                                data-id="<%= notes[i].id %>">Сохранить</button>
+                                            <button class="btn btn-danger" data-type="cancel"
+                                                data-id="<%= notes[i].id %>">Отменить</button>
+                                        </div>
+                                    </div>
                                 </li>
                                 <% } %>
                         </ul>

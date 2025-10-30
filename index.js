@@ -23,11 +23,12 @@ app.get('/', async (request, response) => {
 
 app.post('/', async (request, response) => {
     await addNote(request.body.title)
-    response.render('index', {
-        title: 'Express App',
-        notes: await getNotes(),
-        created: true
-    })
+    // response.render('index', {
+    //     title: 'Express App',
+    //     notes: await getNotes(),
+    //     created: true
+    // })
+    response.redirect('/')
 })
 
 app.delete('/:id', async (request, response) => {

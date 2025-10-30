@@ -50,6 +50,8 @@ async function updateNote(id, newTitle) {
     const noteIndex = notes.findIndex(note => note.id === id)
     notes[noteIndex].title = newTitle;
     await updateData(notes);
+    console.log('Note was edit');
+
 }
 
 module.exports = {
