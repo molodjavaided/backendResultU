@@ -1,72 +1,57 @@
 document.addEventListener('click', event => {
-
-
+  if (event.target.dataset.type === 'remove') {
     const id = event.target.dataset.id
-    const li = event.target.closest('li')
 
+    remove(id).then(() => {
+      event.target.closest('li').remove()
+    })
+  }
 
-    if (event.target.dataset.type === 'remove') {
-        remove(id).then(() => {
-            event.target.closest('li').remove()
+  if (event.target.dataset.type === 'edit') {
+    const $task = event.target.closest('li')
+    const id = event.target.dataset.id
+    const title = event.target.dataset.title
+    const initialHtml = $task.innerHTML
+
+    $task.innerHTML = `
+      <input type="text" value="${title}">
+      <div>
+        <button class="btn btn-success" data-type="save">Сохранить</button>
+        <button class="btn btn-danger" data-type="cancel">Отменить</button>
+      </div>
+    `
+
+    const taskListener = ({target}) => {
+      if (target.dataset.type === 'cancel') {
+        $task.innerHTML = initialHtml
+        $task.removeEventListener('click', taskListener)
+      }
+      if (target.dataset.type === 'save') {
+        const title = $task.querySelector('input').value
+        update({ title, id }).then(() => {
+          $task.innerHTML = initialHtml
+          $task.querySelector('span').innerText = title
+          $task.querySelector('[data-type=edit]').dataset.title = title
+          $task.removeEventListener('click', taskListener)
         })
+      }
     }
 
-    if (event.target.dataset.type === 'update') {
-        const title = li.querySelector('.list-title')
-        const editTitle = li.querySelector(".edit-title")
-        const input = li.querySelector('.edit-input')
-        const editButtons = li.querySelector('.edit-buttons')
-        const saveButtons = li.querySelector('.save-buttons')
-
-        title.style.display = 'none';
-        editButtons.style.display = 'none';
-        editTitle.style.display = 'block';
-        saveButtons.style.display = 'block';
-        input.focus();
-    }
-    if (event.target.dataset.type === 'cancel') {
-        const title = li.querySelector('.list-title')
-        const editTitle = li.querySelector(".edit-title")
-        const editButtons = li.querySelector('.edit-buttons')
-        const saveButtons = li.querySelector('.save-buttons')
-
-        title.style.display = 'block';
-        editButtons.style.display = 'block';
-        editTitle.style.display = 'none';
-        saveButtons.style.display = 'none';
-    }
-
-    if (event.target.dataset.type === 'save') {
-
-        const title = li.querySelector('.list-title')
-        const editTitle = li.querySelector(".edit-title")
-        const input = li.querySelector('.edit-input')
-        const editButtons = li.querySelector('.edit-buttons')
-        const saveButtons = li.querySelector('.save-buttons')
-        const newTitle = input.value.trim()
-
-        if (newTitle === '') {
-            return
-        } else {
-            edit(id, newTitle).then(() => {
-            title.textContent = newTitle
-            title.style.display = 'block';
-            editButtons.style.display = 'block';
-            editTitle.style.display = 'none';
-            saveButtons.style.display = 'none';
-            })
-        }
-    }
+    $task.addEventListener('click', taskListener)
+  }
 })
 
-const remove = async (id) => await fetch(`/${id}`, {method: "DELETE"});
-
-const edit = async (id, title) => {
-    await fetch(`/${id}`, {
-    method: "PUT",
+async function update(newNote) {
+  await fetch(`/${newNote.id}`, {
+    method: 'PUT',
     headers: {
-            'Content-Type': 'application/json'
-        },
-    body: JSON.stringify({ title })
-    })
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(newNote)
+  })
+}
+
+async function remove(id) {
+  await fetch(`/${id}`, {method: 'DELETE'})
 }

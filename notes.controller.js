@@ -1,59 +1,37 @@
-const fs = require('fs/promises') // Стандартный модуль file sistem
-const path = require('path')
 const chalk = require('chalk')
+const Note = require('./models/Note')
 
-const notesPath = path.join(__dirname, 'db.json')
+async function addNote(title, owner) {
+  await Note.create({ title, owner })
 
-
-async function addNote(title) {
-    // const buffer = await fs.readFile(notesPath)
-    // const notes = Buffer.from(buffer).toString('utf-8')
-    // const notes = await fs.readFile(notesPath, {encoding: 'utf-8'}) // тоже самое что верхние две строчки
-
-    const notes = await getNotes()
-
-    const note = {
-        title,
-        id: Date.now().toString()
-    }
-    notes.push(note)
-    await updateData(notes)
-    console.log(chalk.bgRed('Note was added!'));
-
+  console.log(chalk.bgGreen('Note was added!'))
 }
 
 async function getNotes() {
-    const notes = await fs.readFile(notesPath, {encoding: 'utf-8'})
-    return Array.isArray(JSON.parse(notes)) ? JSON.parse(notes) : [];
+  const notes = await Note.find();
+
+  return notes;
 }
 
-async function updateData(data) {
-    await fs.writeFile(notesPath, JSON.stringify(data))
+async function removeNote(id, owner) {
+  const result = await Note.deleteOne({ _id: id, owner })
+
+  if (result.matchedCount === 0) {
+    throw new Error("No note to delete");
+  }
+  console.log(chalk.red(`Note with id="${id}" has been removed.`))
 }
 
-async function printNotes() {
-    const notes = await getNotes()
-    notes.forEach(note => {
-        console.log(`Here is the list of notes: ${note.id} ${note.title}`);
-    });
-}
+async function updateNote(noteData, owner) {
+  const result = await Note.updateOne({ _id: noteData.id, owner }, { title: noteData.title })
 
-async function removeNote(id) {
-    const notes = await getNotes()
-    const noteFilter = notes.filter(note => note.id !== id)
-    await updateData(noteFilter)
-    console.log(noteFilter);
-}
+  if (result.matchedCount === 0) {
+    throw new Error("No note to edit");
+  }
 
-async function updateNote(id, newTitle) {
-    const notes = await getNotes();
-    const noteIndex = notes.findIndex(note => note.id === id)
-    notes[noteIndex].title = newTitle;
-    await updateData(notes);
-    console.log('Note was edit');
-
+  console.log(chalk.bgGreen(`Note with id="${noteData.id}" has been updated!`))
 }
 
 module.exports = {
-    addNote, removeNote, getNotes, updateNote
+  addNote, getNotes, removeNote, updateNote
 }
